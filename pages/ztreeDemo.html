@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+<link type="text/css" rel="stylesheet" href="../JavaScript/zTree/css/zTreeStyle/zTreeStyle.css"/>
+<link type="text/css" rel="stylesheet" href="../JavaScript/zTree/css/demo.css"/>
+<script type="text/javascript"  src="../JavaScript/jquery.min.js"></script>
+<script type="text/javascript"  src="../JavaScript/zTree/js/jquery.ztree.core-3.5.min.js"></script>
+<script type="text/javascript"  src="../JavaScript/zTree/js/jquery.ztree.excheck-3.5.js"></script>
+<script type="text/javascript"  src="../JavaScript/zTree/js/jquery.ztree.exhide-3.5.js"></script>
+<script type="text/javascript"  src="../JavaScript/zTree/js/jquery.ztree.exedit-3.5.js"></script>
+<script type="text/javascript"  src="../JavaScript/zTree/js/userImpower.js"></script>
+<title>ztreeDemo</title>
+<style type="text/css"> 
+p{
+	color:#037e10
+}
+</style> 
+</head>
+<body>
+<div  style=" padding:50px;" >
+	<div class="content_wrap">
+		<div class="zTreeDemoBackground1 left1" style="margin-left:10px">
+			<p style="font-size:12px;font-weight:bold">请选择用户：</p>
+			<p>待选用户</p>
+			<input type="text" value="用户Id/用户账号/用户名称" id="condition"
+           onfocus="if(value==defaultValue){value='';this.style.color='#000'}"
+           onblur="if(!value){value=defaultValue;this.style.color='#999'}"
+           style="color:#999999;width:140px"/>
+			<img src="../images/search.png" style="cursor:pointer"
+         onclick="queryUsers()"/>
+			<ul id="treeOne" class="ztree" style="height:200px; width:150px">
+			</ul>
+		</div>
+		<div style="float:left;margin-top:90px;margin-right:5px">
+			<table cellpadding="0" cellspacing="0" border="0">
+				<tr>
+					<td><input type="image" src="../images/right.png"
+              style="margin-top:15px;height:25px;width:27px" id=""
+              onclick="add_Nodes_2('treeOne/treeTwo')"/></td>
+				</tr>
+				<tr>
+					<td><input type="image" src="../images/rightall.png"
+              style="margin-top:15px;height:25px;width:27px" id=""
+              onclick="add_AllNodes_2('treeOne/treeTwo')"/></td>
+				</tr>
+				<tr>
+					<td><input type="image" src="../images/left.png"
+              style="margin-top:15px;height:25px;width:27px" id=""
+              onclick="delete_Nodes('treeTwo')"/></td>
+				</tr>
+				<tr>
+					<td><input type="image" src="../images/leftall.png"
+              style="margin-top:15px;height:25px;width:27px" id=""
+              onclick="delete_AllNodes_2()"/></td>
+				</tr>
+			</table>
+		</div>
+		<div class="zTreeDemoBackground right1" style="float:left;margin-top:20px">
+			<p>已选用户</p>
+			<ul id="treeTwo" class="ztree" style="height:223px; width:150px">
+			</ul>
+		</div>
+		<div class="zTreeDemoBackground1 left1">
+			<p style="font-size:12px;font-weight:bold">请选择用户拥有的角色：</p>
+			<p>待选角色</p>
+			<input type="text" id="node" value="请输入搜索条件"
+           onfocus="if(value==defaultValue){value='';this.style.color='#000'}"
+           onblur="if(!value){value=defaultValue;this.style.color='#999'}"
+           style="color:#999999;width:140px"/>
+			<img src="../images/search.png" style="cursor:pointer"
+         onclick="query_Nodes();"/>
+			<ul id="treeThree" class="ztree" style="height:200px; width:150px">
+			</ul>
+		</div>
+		<div style="float:left;margin-top:90px;margin-right:5px">
+			<table cellpadding="0" cellspacing="0" border="0">
+				<tr>
+					<td><input type="image" src="../images/right.png"
+              style="margin-top:15px;height:25px;width:27px" id=""
+              onclick="add_Nodes()"/></td>
+				</tr>
+				<tr>
+					<td><input type="image" src="../images/rightall.png"
+              style="margin-top:15px;height:25px;width:27px" id=""
+              onclick="add_AllNodes()"/></td>
+				</tr>
+				<tr>
+					<td><input type="image" src="../images/left.png"
+              style="margin-top:15px;height:25px;width:27px" id=""
+              onclick="delete_Nodes()"/></td>
+				</tr>
+				<tr>
+					<td><input type="image" src="../images/leftall.png"
+              style="margin-top:15px;height:25px;width:27px" id=""
+              onclick="delete_AllNodes()"/></td>
+				</tr>
+			</table>
+		</div>
+		<div class="zTreeDemoBackground1 right1" style="float:left;margin-top:20px">
+			<p>已选角色</p>
+			<ul id="treeFour" class="ztree" style="height:223px; width:150px">
+			</ul>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

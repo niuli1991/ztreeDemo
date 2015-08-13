@@ -1,0 +1,513 @@
+//保存角色和用户节点信息
+var roleNodes;
+var userNodes;
+
+//Ztree的配置数据
+var setting_1 = {
+    check :  {
+        enable : true
+    },
+    data :  {
+        key :  {
+            name : "userName"
+        },
+        simpleData :  {
+            enable : true, idKey : "userId"
+        }
+    },
+    view :  {
+        showIcon : false, addHoverDom : addHoverDomUser1, removeHoverDom : removeHoverDomUser1
+    },
+    callback :  {
+        onDblClick : zTreeOnDblClick_1
+    }
+};
+
+var setting_2 = {
+    check :  {
+        enable : true
+    },
+    data :  {
+        key :  {
+            name : "userName"
+        },
+        simpleData :  {
+            enable : true, idKey : "userId"
+        }
+    },
+    view :  {
+        showIcon : false, addHoverDom : addHoverDomUser2, removeHoverDom : removeHoverDomUser2
+    },
+    callback :  {
+        onDblClick : zTreeOnDblClick_2
+    }
+};
+
+var setting_3 = {
+    check :  {
+        enable : true
+    },
+    data :  {
+        key :  {
+            name : "roleName"
+        },
+        simpleData :  {
+            enable : true, idKey : "roleId"
+        }
+    },
+    view :  {
+        showIcon : false, addHoverDom : addHoverDomRole3, removeHoverDom : removeHoverDomRole3
+    },
+    callback :  {
+        onDblClick : zTreeOnDblClick_3
+    }
+};
+
+var setting_4 = {
+    check :  {
+        enable : true
+    },
+    data :  {
+        key :  {
+            name : "roleName"
+        },
+        simpleData :  {
+            enable : true, idKey : "roleId"
+        }
+    },
+    view :  {
+        showIcon : false, addHoverDom : addHoverDomRole4, removeHoverDom : removeHoverDomRole4
+    },
+    callback :  {
+        onDblClick : zTreeOnDblClick_4
+    }
+};
+
+//加载树形控件数据
+function loadData(users,roles) {
+	var userArray = eval('(' + users + ')');
+	var roleArray = eval('(' + roles + ')');
+	userArray = userArray.users;
+	roleArray = roleArray.roles;
+	userNodes = userArray;
+    roleNodes = roleArray;
+    initTree(userArray,roleArray);
+}
+
+//双击节点事件, 双击某个节点，如该节点是子节点则将该节点添加到右边的树中，如该节点是父节点则将改父节点的所有子节点且子节点非父节点添加到右边树中
+function zTreeOnDblClick_3(event, treeId, treeNode) {
+    var zTree_2 = $.fn.zTree.getZTreeObj("treeFour");
+    if (treeNode.isParent) {
+        var nodes = treeNode.children;
+        get_Children(nodes, zTree_2);
+    }
+    else {
+        isRepeat(treeNode, zTree_2);
+    }
+
+};
+
+//双击节点事件，双击某个节点将该节点从树中删除
+function zTreeOnDblClick_4(event, treeId, treeNode) {
+    var zTree_2 = $.fn.zTree.getZTreeObj("treeFour");
+    zTree_2.removeNode(treeNode);
+};
+
+//添加选中节点 
+function add_Nodes() {
+    var zTree = $.fn.zTree.getZTreeObj("treeThree");
+    var zTree_2 = $.fn.zTree.getZTreeObj("treeFour");
+    var nodes = zTree.getCheckedNodes(true);//获取选中节点集合
+    for (var item in nodes) {
+        if (!nodes[item].isParent) {
+            isRepeat(nodes[item], zTree_2);
+        }
+    }
+}
+
+//添加全部节点 
+function add_AllNodes() {
+    var zTree = $.fn.zTree.getZTreeObj("treeThree");
+    var zTree_2 = $.fn.zTree.getZTreeObj("treeFour");
+    var nodes = zTree.getNodes();
+    get_Children(nodes, zTree_2);
+}
+
+//获取选中节点的子节点
+function get_Children(treeNode, zTree_2) {
+    for (var item in treeNode) {
+        if (treeNode[item].isParent) {
+            var children = treeNode[item].children;//获取该节点的子节点集合
+            get_Children(children, zTree_2);
+        }
+        else {
+            isRepeat(treeNode[item], zTree_2);
+        }
+    }
+}
+
+//删除选中节点
+function delete_Nodes() {
+    var zTree_2 = $.fn.zTree.getZTreeObj("treeFour");
+    var nodes = zTree_2.getCheckedNodes(true);//获取选中节点集合
+    for (var item in nodes) {
+        if (!nodes[item].isParent) {
+            zTree_2.removeNode(nodes[item]);
+        }
+    }
+}
+
+//删除全部节点
+function delete_AllNodes() {
+    var zTreeNodes = [];
+    //重新初始化树即删掉全部节点
+    $.fn.zTree.init($("#treeFour"), setting_4, zTreeNodes);
+}
+
+//搜索节点
+function query_Nodes() {
+    var nodeName = $("#node").val();
+    //去掉字符串内空格
+    nodeName = $.trim(nodeName);
+    if ((nodeName == "" && nodeName.length == 0) || nodeName == "请输入搜索条件") {
+        //重新初始化树
+        $.fn.zTree.init($("#treeThree"), setting_3, roleNodes);
+    }
+    else {
+        //重新初始化树
+        $.fn.zTree.init($("#treeThree"), setting_3, roleNodes);
+        var zTree = $.fn.zTree.getZTreeObj("treeThree");
+        var treeNode = zTree.getNodesByParamFuzzy("roleName", nodeName, null);
+        if (treeNode.length == 0) {
+            alert(nodeName + "不存在!");
+        }
+        else {
+            //将搜索到的节点重新建立一棵树				
+            var zTreeNodes = [];
+            $.fn.zTree.init($("#treeThree"), setting_3, zTreeNodes);
+            for (var item in treeNode) {
+                if (treeNode[item].isParent) {
+                    zTree.addNodes(null, treeNode[item]);
+                }
+                else {
+                    zTree.addNodes(null, 
+                    {
+                        roleName : treeNode[item].roleName, roleId : treeNode[item].roleId
+                    });
+                }
+            }
+        }
+    }
+    forbiddenNodes();
+}
+
+//禁用已添加的节点
+function forbiddenNodes() {
+    var zTree = $.fn.zTree.getZTreeObj("treeThree");
+    var zTree_2 = $.fn.zTree.getZTreeObj("treeFour");
+    var treeNodes = zTree_2.getNodes();
+    var flage = "";
+    for (var item in treeNodes) {
+        flage = zTree.getNodesByParam("roleId", treeNodes[item].roleId, null);
+        if (flage.length != 0) {
+            flage[0].checked = true;
+            zTree.setChkDisabled(flage[0], true);
+        }
+    }
+}
+
+//检查所添加的节点是否已存在 
+function isRepeat(treeNode, zTree) {
+    var flage = zTree.getNodeByParam("roleId", treeNode.roleId, null);
+    if (flage == null) {
+        zTree.addNodes(null, 
+        {
+            roleName : treeNode.roleName, roleId : treeNode.roleId, checked : true
+        });
+        // checkNode("roleId",treeNode,zTree);
+    }
+    else {
+        return false;
+    }
+}
+
+
+//显示用户自定义控件
+function addHoverDomUser1(treeId, treeNode) {
+    var aObj = $("#" + treeNode.tId + "_a");
+    if(typeof($("#diyBtn1_" + treeNode.userId).attr("id")) =="undefined"){
+        var editStr = "<span id='diyBtn_space1_" + treeNode.userId + "' ><\/span>" + "<input type='image' src='../images/see.png' id='diyBtn1_" + treeNode.userId + "' title='" + treeNode.userName + "' onfocus='this.blur();'\/>";
+        aObj.append(editStr);
+        
+        var btn = $("#diyBtn1_" + treeNode.userId);
+        if (btn)
+            btn.bind("click", function () {
+                alert(treeNode.userName);
+            });
+    }
+};
+
+function removeHoverDomUser1(treeId, treeNode) {
+    $("#diyBtn1_" + treeNode.userId).unbind().remove();
+    $("#diyBtn_space1_" + treeNode.userId).unbind().remove();
+};
+
+//显示用户自定义控件
+function addHoverDomUser2(treeId, treeNode) {
+    var aObj = $("#" + treeNode.tId + "_a");
+    if(typeof($("#diyBtn2_" + treeNode.userId).attr("id")) =="undefined"){
+        var editStr = "<span id='diyBtn_space2_" + treeNode.userId + "' ><\/span>" + "<input type='image' src='../images/see.png' id='diyBtn2_" + treeNode.userId + "' title='" + treeNode.userName + "' onfocus='this.blur();'\/>";
+        aObj.append(editStr);
+        
+        var btn = $("#diyBtn2_" + treeNode.userId);
+        if (btn)
+            btn.bind("click", function () {
+                alert(treeNode.userName);
+            });
+    }
+};
+
+function removeHoverDomUser2(treeId, treeNode) {
+    $("#diyBtn2_" + treeNode.userId).unbind().remove();
+    $("#diyBtn_space2_" + treeNode.userId).unbind().remove();
+};
+
+//显示用户自定义控件
+function addHoverDomRole3(treeId, treeNode) {
+    var aObj = $("#" + treeNode.tId + "_a");
+    if ($("#diyBtn_" + treeNode.roleId).length > 0)
+        return;
+    var editStr = "<span id='diyBtn_space_" + treeNode.roleId + "' ><\/span>" + "<input type='image' src='../images/see.png' id='diyBtn_" + treeNode.roleId + "' title='" + treeNode.roleName + "' onfocus='this.blur();'\/>";
+    aObj.append(editStr);
+    var btn = $("#diyBtn_" + treeNode.roleId);
+    if (btn)
+        btn.bind("click", function () {
+            alert(treeNode.roleName);
+        });
+};
+
+function removeHoverDomRole3(treeId, treeNode) {
+    $("#diyBtn_" + treeNode.roleId).unbind().remove();
+    $("#diyBtn_space_" + treeNode.roleId).unbind().remove();
+};
+
+//显示用户自定义控件
+function addHoverDomRole4(treeId, treeNode) {
+    var aObj = $("#" + treeNode.tId + "_a");
+    if(typeof($("#diyBtn4_" + treeNode.roleId).attr("id")) =="undefined"){
+        var editStr = "<span id='diyBtn_space4_" + treeNode.roleId + "' ><\/span>" + "<input type='image' src='../images/see.png' id='diyBtn4_" + treeNode.roleId + "' title='" + treeNode.roleName + "' onfocus='this.blur();'\/>";
+        aObj.append(editStr);
+        
+        var btn = $("#diyBtn4_" + treeNode.roleId);
+        if (btn)
+            btn.bind("click", function () {
+                alert(treeNode.roleName);
+            });
+    }
+};
+
+function removeHoverDomRole4(treeId, treeNode) {
+    $("#diyBtn4_" + treeNode.roleId).unbind().remove();
+    $("#diyBtn_space4_" + treeNode.roleId).unbind().remove();
+};
+
+function expand_Nodes(treeNode, ztree) {
+    var parentNode = treeNode.getParentNode();
+    if (parentNode != null) {
+        ztree.expandNode(parentNode, true, true, true);
+    }
+}
+
+//获取选中用户信息
+function getSelectedUsers(treeId) {
+    var treeObj = $.fn.zTree.getZTreeObj(treeId);
+    var checkedItems = [];
+    if(tt == "")
+        checkedItems = parent.getCheck();
+        
+    $.each(checkedItems, function (index, item) {
+        //将选中用户添加到树中
+        var newNode = {
+            userId : item.userId,userName : item.userName, checked : true
+        };
+        newNode = treeObj.addNodes(null, newNode);
+    });
+}
+
+function setCheck() {
+    var zTree = $.fn.zTree.getZTreeObj("treeThree"), type = {
+        "Y" : py + sy, "N" : pn + sn
+    };
+    zTree.setting.check.chkboxType = type;
+}
+
+function initTree(users,roles) {
+    $.fn.zTree.init($("#treeOne"), setting_1,users);
+    $.fn.zTree.init($("#treeTwo"), setting_2);
+    $.fn.zTree.init($("#treeThree"), setting_3, roles);
+    $.fn.zTree.init($("#treeFour"), setting_4);
+}
+
+function ajaxLoadEnd() {
+    $(".datagrid-mask").remove();
+    $(".datagrid-mask-msg").remove();
+}
+
+/*
+ * 
+ * 待选用户和已选用户树事件
+ * 
+ * */
+//搜索用户
+function queryUsers() {
+    var condition = $("#condition").val();
+	//去掉字符串内空格
+    condition = $.trim(condition);
+    if ((condition == "" && condition.length == 0) || condition == "用户Id/用户账号/用户名称") {
+        //重新初始化树
+        $.fn.zTree.init($("#treeOne"), setting_1, userNodes);
+    }
+    else {
+        //重新初始化树
+        $.fn.zTree.init($("#treeOne"), setting_1, userNodes);
+        var zTree = $.fn.zTree.getZTreeObj("treeOne");
+        var treeNode = zTree.getNodesByParamFuzzy("userName", condition, null);
+        if (treeNode.length == 0) {
+            alert(condition + "不存在!");      
+        }
+        else {
+            //将搜索到的节点重新建立一棵树				
+            var zTreeNodes = [];
+            $.fn.zTree.init($("#treeOne"), setting_1, zTreeNodes);
+            for (var item in treeNode) {
+                if (treeNode[item].isParent) {
+                    zTree.addNodes(null, treeNode[item]);
+                }
+                else {
+                    zTree.addNodes(null, 
+                    {
+                        userName : treeNode[item].userName, userId : treeNode[item].userId
+                    });
+                }
+            }
+        }
+    }
+    forbiddenNodes_2();
+}
+
+//检查所添加的节点是否已存在 
+function isRepeat_2(treeNode, zTree) {
+    var flage = zTree.getNodeByParam("userId", treeNode.userId, null);
+    userIdNew = treeNode.userAccount;
+    userNameNew = treeNode.userName;
+    if (flage == null) {
+        zTree.addNodes(null, 
+        {
+            userName : treeNode.userName, userId : treeNode.userId, checked : true
+        });
+    }
+    else {
+        return false;
+    }
+}
+
+//禁用已添加的节点
+function forbiddenNodes_2() {
+    var zTree = $.fn.zTree.getZTreeObj("treeOne");
+    var zTree_2 = $.fn.zTree.getZTreeObj("treeTwo");
+    var treeNodes = zTree_2.getNodes();
+    var tree = zTree.getNodes();
+    var flage = "";
+    for (var item in treeNodes) {
+        flage = zTree.getNodesByParam("userId", treeNodes[item].userId, null);
+        if (flage.length != 0) {
+            flage[0].checked = true;
+            zTree.setChkDisabled(flage[0], true);
+        }
+    }
+}
+
+function zTreeOnDblClick_1(event, treeId, treeNode) {
+    var zTree_2 = $.fn.zTree.getZTreeObj("treeTwo");
+    if (treeNode.isParent) {
+        var nodes = treeNode.children;
+    
+        get_Children_2(nodes, zTree_2);
+    }
+    else {
+        isRepeat_2(treeNode, zTree_2);
+    }
+}
+
+function zTreeOnDblClick_2(event, treeId, treeNode) {
+    var zTree_2 = $.fn.zTree.getZTreeObj("treeTwo");
+    zTree_2.removeNode(treeNode);
+}
+
+//获取选中节点的子节点
+/*参数：
+ * treeNodes 节点集合
+ * zTree_2   节点集合所在树的ztree树对象
+ * */
+function get_Children_2(treeNodes, zTree_2) {
+    for (var item in treeNodes) {
+        if (treeNodes[item].isParent) {
+            var children = treeNodes[item].children;//获取该节点的子节点集合            
+    
+            get_Children_2(children, zTree_2);
+        }
+        else {
+            
+            isRepeat_2(treeNodes[item], zTree_2);
+        }
+    }
+}
+
+//添加选中节点
+/*将甲树选中非父节点的子节点添加到乙树
+ * 参数：
+ * 例如：
+ * treeIdOne  甲树的id(不能有/)
+ * treeIdTwo  乙树的id(不能有/)
+ * treeIds    命名方式为：甲乙两棵树id组合起来（甲树的id/乙树的id）
+ * */
+function add_Nodes_2(treeIds) {
+    var tree_Ids = treeIds.split("/");
+    var zTree = $.fn.zTree.getZTreeObj(tree_Ids[0]);
+    var zTree_2 = $.fn.zTree.getZTreeObj(tree_Ids[1]);
+    var nodes = zTree.getCheckedNodes(true);//获取选中节点集合
+    for (var item in nodes) {
+        if (!nodes[item].isParent) {
+            isRepeat_2(nodes[item], zTree_2);
+        }
+    }
+}
+
+//添加全部节点 
+/*将甲树全部非父节点的子节点添加到乙树
+ * 参数：
+ * 例如：
+ * treeIdOne  甲树的id(不能有/)
+ * treeIdTwo  乙树的id(不能有/)
+ * treeIds    命名方式为：甲乙两棵树id组合起来（甲树的id/乙树的id）
+ * */
+function add_AllNodes_2(treeIds) {
+    var tree_Ids = treeIds.split("/");
+    var zTree = $.fn.zTree.getZTreeObj(tree_Ids[0]);
+    var zTree_2 = $.fn.zTree.getZTreeObj(tree_Ids[1]);
+    var nodes = zTree.getNodes();
+    get_Children_2(nodes, zTree_2);
+}
+
+//删除全部节点
+function delete_AllNodes_2() {
+    var zTreeNodes = [];
+    //重新初始化树即删掉全部节点
+    $.fn.zTree.init($("#treeTwo"), setting_2, zTreeNodes);
+}
+
+$(document).ready(function () {
+	var users = "{\"users\":[{\"userId\":\"1\",\"userName\":\"a\"},{\"userId\":\"2\",\"userName\":\"b\"},{\"userId\":\"3\",\"userName\":\"c\"},{\"userId\":\"4\",\"userName\":\"d\"},{\"userId\":\"5\",\"userName\":\"e\"},{\"userId\":\"6\",\"userName\":\"f\"},{\"userId\":\"7\",\"userName\":\"g\"}]}";
+    var roles = "{\"roles\":[{\"roleId\":\"1\",\"roleName\":\"丞相\"},{\"roleId\":\"2\",\"roleName\":\"太师\"},{\"roleId\":\"3\",\"roleName\":\"将军\"},{\"roleId\":\"4\",\"roleName\":\"太尉\"},{\"roleId\":\"5\",\"roleName\":\"侍郎\"}]}";      
+    loadData(users,roles);
+});
