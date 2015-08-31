@@ -157,16 +157,6 @@ function delete_Nodes() {
     }
 }
 
-function delete_Nodes_2() {
-    var zTree_2 = $.fn.zTree.getZTreeObj("treeTwo");
-    var nodes = zTree_2.getCheckedNodes(true);//获取选中节点集合
-    for (var item in nodes) {
-        if (!nodes[item].isParent) {
-            zTree_2.removeNode(nodes[item]);
-        }
-    }
-}
-
 //删除全部节点
 function delete_AllNodes() {
     var zTreeNodes = [];
